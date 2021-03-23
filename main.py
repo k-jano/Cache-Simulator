@@ -1,6 +1,8 @@
 import json
 
 from algorithms.FIFO import FIFO
+from algorithms.LRU import LRU
+from algorithms.LFU import LFU
 
 class SwapAlgorithmEvalutor():
 
@@ -17,7 +19,9 @@ class SwapAlgorithmEvalutor():
       self.files_size = data['files_size']
       self.order = data['order']
 
-    self.algorithm = FIFO(self.memory_size, self.files_size)
+    #self.algorithm = FIFO(self.memory_size, self.files_size)
+    #self.algorithm = LRU(self.memory_size, self.files_size)
+    self.algorithm = LFU(self.memory_size, self.files_size)
 
   def process_workflow(self):
     for file in self.order:

@@ -20,10 +20,6 @@ class FIFO():
     else:
       self.swap(file, file_size)
 
-    print(self.queue)
-    print(self.size)
-
-
   def swap(self, file, file_size):
     while self.size + file_size > self.memory_size:
       self.size -= self.files_size[self.queue[0]]
