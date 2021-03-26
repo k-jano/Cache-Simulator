@@ -3,7 +3,6 @@ import random
 class RR():
 
   def __init__(self, memory_size, files_size):
-    self.MAX = 1000000
     self.memory_size = memory_size
     self.size = 0
     self.cache = []
