@@ -1,6 +1,7 @@
 class FIFO():
 
-  def __init__(self, memory_size, files_size):
+  def __init__(self, memory_size, files_size, *args):
+    self.name = 'FIFO'
     self.memory_size = memory_size
     self.size = 0
     self.queue = []
@@ -33,3 +34,6 @@ class FIFO():
 
   def get_swap_count(self):
     return self.swap_count
+
+  def get_name(self):
+    return self.name

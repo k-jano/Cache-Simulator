@@ -1,6 +1,7 @@
 class Belady():
 
-  def __init__(self, memory_size, files_size, order):
+  def __init__(self, memory_size, files_size, order, *args):
+    self.name = 'Belady'
     self.MAX = 1000000
     self.memory_size = memory_size
     self.size = 0
@@ -52,3 +53,6 @@ class Belady():
 
   def get_swap_count(self):
     return self.swap_count
+
+  def get_name(self):
+    return self.name

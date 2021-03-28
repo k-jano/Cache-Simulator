@@ -1,6 +1,7 @@
 class LFU():
 
-  def __init__(self, memory_size, files_size):
+  def __init__(self, memory_size, files_size, *args):
+    self.name = 'LFU'
     self.MAX = 1000000
     self.memory_size = memory_size
     self.size = 0
@@ -48,3 +49,6 @@ class LFU():
 
   def get_swap_count(self):
     return self.swap_count
+
+  def get_name(self):
+    return self.name
