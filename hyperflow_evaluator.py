@@ -1,7 +1,12 @@
 import json
+import time
+
 import redis
 
 from node import Node
+
+channel = 'SIMULATOR'
+channel_rcv = 'SIMULATOR_RCV'
 
 class Simulator():
   def __init__(self):
@@ -10,6 +15,7 @@ class Simulator():
     self.keys_out = []
     self.r = redis.StrictRedis(host="localhost", port=6379, db=0)
     self.nodes = [Node(0), Node(1), Node(2)]
+    self.p = self.r.pubsub()
 
   def bytes_to_string(self, byte_obj):
     return byte_obj.decode("utf-8")
@@ -42,13 +48,19 @@ class Simulator():
 
   def schedule(self, job_id):
     node = self.get_most_accurate_node()
-    print('Job %s scheduled on %s' % (job_id, node.id))
+    print('Job %s scheduled on node %s' % (job_id, node.id))
 
-  def process(self):
-    self.get_workflow()
-    for job in range(len(self.keys_in)):
-      self.schedule(job)
+  def routine(self, msg):
+    print(msg)
+    if msg.get('type') != 'subscribe':
+      #TODO Schedule and mock execution
+      time.sleep(3)
+      self.r.publish(channel_rcv, msg.get('data'))
+      
+  def subscribe(self):
+    self.p.subscribe(**{channel:self.routine})
+    self.p.run_in_thread(sleep_time = 0.001)
 
 if __name__ == "__main__":
   simulator = Simulator()
-  simulator.process()
+  simulator.subscribe()
