@@ -6,7 +6,6 @@ import redis
 from node import Node
 
 channel = 'SIMULATOR'
-channel_rcv = 'SIMULATOR_RCV'
 
 class Simulator():
   def __init__(self):
@@ -55,11 +54,17 @@ class Simulator():
     if msg.get('type') != 'subscribe':
       #TODO Schedule and mock execution
       time.sleep(3)
-      self.r.publish(channel_rcv, msg.get('data'))
+      self.r.publish(self.bytes_to_string(msg.get('data')), 'Processed')
       
   def subscribe(self):
-    self.p.subscribe(**{channel:self.routine})
-    self.p.run_in_thread(sleep_time = 0.001)
+    try:
+      self.p.subscribe(**{channel:self.routine})
+      t = self.p.run_in_thread(sleep_time = 0.001)
+      while True:
+        pass
+    except KeyboardInterrupt:
+      print('Keyboard Interrupt')
+      t.stop()
 
 if __name__ == "__main__":
   simulator = Simulator()
