@@ -1,5 +1,6 @@
 import json
 import time
+from datetime import datetime
 
 import redis
 
@@ -47,15 +48,17 @@ class Simulator():
 
   def schedule(self, job_id):
     node = self.get_most_accurate_node()
-    print('Job %s scheduled on node %s' % (job_id, node.id))
+    print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
+    node.execute(job_id)
 
   def routine(self, msg):
     print(msg)
     if msg.get('type') != 'subscribe':
       #TODO Schedule and mock execution
-      time.sleep(3)
-      self.r.publish(self.bytes_to_string(msg.get('data')), 'Processed')
-      
+      data = self.bytes_to_string(msg.get('data'))
+      self.schedule(data)
+      self.r.publish(data, 'Processed')
+
   def subscribe(self):
     try:
       self.p.subscribe(**{channel:self.routine})
