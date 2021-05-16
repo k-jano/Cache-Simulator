@@ -53,9 +53,10 @@ class Simulator():
     node.execute(job_id)
 
   def thread_routine(self, msg):
-    data = self.bytes_to_string(msg.get('data'))
-    self.schedule(data)
-    self.r.publish(data, 'Processed')
+    data = json.loads(self.bytes_to_string(msg.get('data')))
+    key = data.get('key')
+    self.schedule(key)
+    self.r.publish(key, 'Processed')
 
   def routine(self, msg):
     print(msg)
