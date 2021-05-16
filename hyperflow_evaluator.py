@@ -1,6 +1,7 @@
 import json
 import time
 from datetime import datetime
+from threading import Thread
 
 import redis
 
@@ -51,13 +52,17 @@ class Simulator():
     print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
     node.execute(job_id)
 
+  def thread_routine(self, msg):
+    data = self.bytes_to_string(msg.get('data'))
+    self.schedule(data)
+    self.r.publish(data, 'Processed')
+
   def routine(self, msg):
     print(msg)
     if msg.get('type') != 'subscribe':
       #TODO Schedule and mock execution
-      data = self.bytes_to_string(msg.get('data'))
-      self.schedule(data)
-      self.r.publish(data, 'Processed')
+      thread = Thread(target = self.thread_routine, args=(msg, ))
+      thread.start()
 
   def subscribe(self):
     try:
