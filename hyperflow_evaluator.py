@@ -17,6 +17,7 @@ class Simulator():
     self.r = redis.StrictRedis(host="localhost", port=6379, db=0)
     self.nodes = [Node(0), Node(1), Node(2)]
     self.p = self.r.pubsub()
+    self.flag = True
 
   def bytes_to_string(self, byte_obj):
     return byte_obj.decode("utf-8")
@@ -47,19 +48,18 @@ class Simulator():
 
     return best_node
 
-  def schedule(self, job_id):
+  def schedule(self, job_id, msg):
     node = self.get_most_accurate_node()
     print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
-    node.execute(job_id)
+    node.execute(job_id, msg)
 
   def thread_routine(self, msg):
     data = json.loads(self.bytes_to_string(msg.get('data')))
     key = data.get('key')
-    self.schedule(key)
+    self.schedule(key, msg)
     self.r.publish(key, 'Processed')
 
   def routine(self, msg):
-    print(msg)
     if msg.get('type') != 'subscribe':
       #TODO Schedule and mock execution
       thread = Thread(target = self.thread_routine, args=(msg, ))
