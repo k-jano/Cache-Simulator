@@ -62,21 +62,21 @@ class Simulator():
     self.r.publish(key, 'Processed')
     if key.split(":")[2] == "619":
       print('--- HIT ---')
-      hit_count = [0, 0, 0, 0]
+      hit_count = [0, 0, 0, 0, 0]
       for node in self.nodes:
         hit_count = [x+y for x, y in zip(hit_count, node.get_hit())]
         print(node.get_hit())
       print("Total hit_count " + str(hit_count))
 
       print('--- MISS ---')
-      miss_count = [0, 0, 0, 0]
+      miss_count = [0, 0, 0, 0, 0]
       for node in self.nodes:
         miss_count = [x+y for x, y in zip(miss_count, node.get_miss())]
         print(node.get_miss())
       print("Total miss_count " + str(miss_count))
 
       print('--- SWAP ---')
-      swap_count = [0, 0, 0, 0]
+      swap_count = [0, 0, 0, 0, 0]
       for node in self.nodes:
         swap_count = [x+y for x, y in zip(swap_count, node.get_swap())]
         print(node.get_swap())

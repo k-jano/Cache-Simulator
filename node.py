@@ -6,6 +6,7 @@ from algorithms.FIFO import FIFO
 from algorithms.LFU import LFU
 from algorithms.LRU import LRU
 from algorithms.RR import RR
+from algorithms.Belady import Belady
 
 class Node():
   def __init__(self, id):
@@ -28,8 +29,12 @@ class Node():
       file_size = json.load(json_file)
       self.file_size = file_size
 
-    cache_size = 1024 * 1024 * 1024
-    self.policies = [FIFO(cache_size, self.file_size), LFU(cache_size, self.file_size), LRU(cache_size, self.file_size), RR(cache_size, self.file_size)]
+    cache_size = 100 * 1024 * 1024
+    self.policies = [FIFO(cache_size, self.file_size),
+      LFU(cache_size, self.file_size),
+      LRU(cache_size, self.file_size),
+      RR(cache_size, self.file_size), 
+      Belady(cache_size, self.file_size)]
 
   def get_avalaible_cpu(self):
     return self.cpu
