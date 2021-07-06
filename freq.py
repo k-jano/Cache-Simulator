@@ -28,4 +28,9 @@ for process in process_list:
     for file in process.get("ins"):
         frequency_dict[signal_list[file]] +=1
 
-pp.pprint(frequency_dict)
+#pp.pprint(frequency_dict)
+
+out_path = "./freq.json"
+
+with open(out_path, 'w+') as f:
+    json.dump(frequency_dict, f, indent=2)

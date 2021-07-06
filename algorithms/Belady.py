@@ -2,7 +2,7 @@ import json
 
 class Belady():
 
-  def __init__(self, memory_size, files_size, *args):
+  def __init__(self, memory_size, files_size, BeladyFreq, *args):
     self.name = 'Belady'
     self.MAX = 1000000
     self.memory_size = memory_size
@@ -11,16 +11,17 @@ class Belady():
     self.swap_count = 0
     self.files_size = files_size
     #.order = order
-    self.path = "order.json"
+    self.path = "freq.json"
     self.step = 0
     self.belady_dict = {}
     self.load_order()
     self.hit_count = 0
     self.miss_count = 0
+    self.BeladyFreq = BeladyFreq
 
   def load_order(self):
     f = open(self.path)
-    self.order = json.load(f)
+    self.freq = json.load(f)
     f.close()
 
   def process(self, file):
@@ -54,18 +55,29 @@ class Belady():
 
     self.size += file_size
     self.cache.append(file)
+    self.BeladyFreq.decrement(file)
 
   def get_Belady(self, root_file):
+    # Belady_elem = -1
+    # Belady_time = -1
+    # for file in self.cache:
+    #   #if self.belady_dict[root_file][file] = 
+    #   distance = self.order[root_file][file]
+    #   if distance > Belady_time or distance == -1:
+    #     Belady_elem = file
+    #     if distance == -1:
+    #       Belady_time = self.MAX
+    #     Belady_time = distance
+
+    Belady_val = self.MAX
     Belady_elem = -1
-    Belady_time = -1
     for file in self.cache:
-      #if self.belady_dict[root_file][file] = 
-      distance = self.order[root_file][file]
-      if distance > Belady_time or distance == -1:
+      if self.BeladyFreq.get(file) < Belady_val:
+        Belady_val = self.BeladyFreq.get(file)
         Belady_elem = file
-        if distance == -1:
-          Belady_time = self.MAX
-        Belady_time = distance
+      # if self.freq[file] < Belady_val:
+      #   Belady_val = self.freq[file]
+      #   Belady_elem = file
 
     return Belady_elem
 

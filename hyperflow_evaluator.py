@@ -6,6 +6,7 @@ from threading import Thread
 import redis
 
 from node import Node
+from belady_freq import BeladyFreq
 
 channel = 'SIMULATOR'
 
@@ -15,7 +16,8 @@ class Simulator():
     self.keys_in = []
     self.keys_out = []
     self.r = redis.StrictRedis(host="localhost", port=6379, db=0)
-    self.nodes = [Node(0), Node(1), Node(2)]
+    self.BeladyFreq = BeladyFreq()
+    self.nodes = [Node(0, self.BeladyFreq), Node(1, self.BeladyFreq), Node(2, self.BeladyFreq)]
     self.p = self.r.pubsub()
     self.flag = True
 

@@ -9,7 +9,7 @@ from algorithms.RR import RR
 from algorithms.Belady import Belady
 
 class Node():
-  def __init__(self, id):
+  def __init__(self, id, BeladyFreq):
     self.cache = []
     self.cpu = 100
     self.id = id
@@ -17,6 +17,7 @@ class Node():
     self.env = simpy.Environment()
     self.policies = []
     self.file_size = None
+    self.BeladyFreq = BeladyFreq
 
     self.load_data()
 
@@ -29,12 +30,12 @@ class Node():
       file_size = json.load(json_file)
       self.file_size = file_size
 
-    cache_size = 100 * 1024 * 1024
+    cache_size = 1000 * 1024 * 1024
     self.policies = [FIFO(cache_size, self.file_size),
       LFU(cache_size, self.file_size),
       LRU(cache_size, self.file_size),
       RR(cache_size, self.file_size), 
-      Belady(cache_size, self.file_size)]
+      Belady(cache_size, self.file_size, self.BeladyFreq)]
 
   def get_avalaible_cpu(self):
     return self.cpu
