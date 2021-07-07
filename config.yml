@@ -1,0 +1,6 @@
+redis:
+  address: localhost
+  port: 6379
+  channel: SIMULATOR
+simulator:
+  last_id: '619'

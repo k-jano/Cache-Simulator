@@ -1,6 +1,5 @@
 import time
 import json
-import simpy
 
 from algorithms.FIFO import FIFO
 from algorithms.LFU import LFU
@@ -14,7 +13,6 @@ class Node():
     self.cpu = 100
     self.id = id
     self.data = None
-    self.env = simpy.Environment()
     self.policies = []
     self.file_size = None
     self.BeladyFreq = BeladyFreq
