@@ -1,11 +1,14 @@
 import time
 import json
+import yaml
 
 from algorithms.FIFO import FIFO
 from algorithms.LFU import LFU
 from algorithms.LRU import LRU
 from algorithms.RR import RR
 from algorithms.Belady import Belady
+
+config = yaml.safe_load(open("./config.yml"))
 
 class Node():
   def __init__(self, id, BeladyFreq):
@@ -28,7 +31,7 @@ class Node():
       file_size = json.load(json_file)
       self.file_size = file_size
 
-    cache_size = 1000 * 1024 * 1024
+    cache_size = config['simulator']['cache_size'] * 1024 * 1024
     self.policies = [FIFO(cache_size, self.file_size),
       LFU(cache_size, self.file_size),
       LRU(cache_size, self.file_size),

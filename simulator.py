@@ -18,9 +18,17 @@ class Simulator():
     self.keys_out = []
     self.r = redis.StrictRedis(host=config['redis']['address'], port=config['redis']['port'], db=0)
     self.BeladyFreq = BeladyFreq()
-    self.nodes = [Node(0, self.BeladyFreq), Node(1, self.BeladyFreq), Node(2, self.BeladyFreq)]
+    #self.nodes = [Node(0, self.BeladyFreq), Node(1, self.BeladyFreq), Node(2, self.BeladyFreq)]
     self.p = self.r.pubsub()
     self.flag = True
+    self.prepare_nodes()
+
+  def prepare_nodes(self):
+    nodes = []
+    for i in range(config['simulator']['nodes']):
+      nodes.append(Node(i, self.BeladyFreq))
+
+    self.nodes = nodes
 
   def bytes_to_string(self, byte_obj):
     return byte_obj.decode("utf-8")
