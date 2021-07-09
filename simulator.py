@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 from threading import Thread
 import yaml
+from collections import deque
 
 import redis
 
@@ -22,6 +23,8 @@ class Simulator():
     self.p = self.r.pubsub()
     self.flag = True
     self.prepare_nodes()
+    self.queue = deque([])
+    self.thread_sleep_interval = 0.001
 
   def prepare_nodes(self):
     nodes = []
@@ -32,21 +35,6 @@ class Simulator():
 
   def bytes_to_string(self, byte_obj):
     return byte_obj.decode("utf-8")
-
-  def sort_keys(self):
-    self.keys_in.sort()
-    self.keys_out.sort()
-
-  def get_workflow(self):
-    for key in self.r.scan_iter("wf:" + str(self.wf_key) + ":task:[0-9]*:*"):
-      key_str = self.bytes_to_string(key)
-      # print(key_str)
-      self.keys_in.append(key) if key_str.endswith('ins') else self.keys_out.append(key)
-    
-    # for key in self.keys_in:
-    #   print(self.r.zrange(key, 0, -1))
-
-    self.sort_keys()
 
   def get_most_accurate_node(self):
     best_node = None
@@ -59,39 +47,62 @@ class Simulator():
 
     return best_node
 
-  def schedule(self, job_id, msg):
-    node = self.get_most_accurate_node()
-    print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
-    node.execute(job_id, msg)
+  def scheduler_routine(self, job_id, data, node):
+    node.execute(job_id, data)
+
+    self.r.publish(job_id, 'Processed')
+
+    if job_id.split(":")[2] == config['simulator']['last_id']:
+      self.print_output()
+
+  def schedule(self):
+    while True:
+      if self.queue:
+        job = self.queue.popleft()
+        job_id = job['key']
+        data = job['data']
+
+        node = self.get_most_accurate_node()
+        print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
+        t = Thread(target = self.scheduler_routine, daemon=True, args=(job_id, data, node))
+        t.start()
+      else:
+        time.sleep(self.thread_sleep_interval)
+
+  def print_output(self):
+    print('--- HIT ---')
+    hit_count = [0, 0, 0, 0, 0]
+    for node in self.nodes:
+      hit_count = [x+y for x, y in zip(hit_count, node.get_hit())]
+      #print(node.get_hit())
+    print("Total hit_count " + str(hit_count))
+
+    print('--- MISS ---')
+    miss_count = [0, 0, 0, 0, 0]
+    for node in self.nodes:
+      miss_count = [x+y for x, y in zip(miss_count, node.get_miss())]
+      #print(node.get_miss())
+    print("Total miss_count " + str(miss_count))
+
+    print('--- SWAP ---')
+    swap_count = [0, 0, 0, 0, 0]
+    for node in self.nodes:
+      swap_count = [x+y for x, y in zip(swap_count, node.get_swap())]
+      #print(node.get_swap())
+    print("Total swap_count " + str(swap_count))
 
   def thread_routine(self, msg):
     data = json.loads(self.bytes_to_string(msg.get('data')))
     key = data.get('key')
     # if key.split(":")[2] == "619":
     #   print(json.dumps(data, indent=4))
-    self.schedule(key, data)
-    self.r.publish(key, 'Processed')
-    if key.split(":")[2] == config['simulator']['last_id']:
-      print('--- HIT ---')
-      hit_count = [0, 0, 0, 0, 0]
-      for node in self.nodes:
-        hit_count = [x+y for x, y in zip(hit_count, node.get_hit())]
-        #print(node.get_hit())
-      print("Total hit_count " + str(hit_count))
-
-      print('--- MISS ---')
-      miss_count = [0, 0, 0, 0, 0]
-      for node in self.nodes:
-        miss_count = [x+y for x, y in zip(miss_count, node.get_miss())]
-        #print(node.get_miss())
-      print("Total miss_count " + str(miss_count))
-
-      print('--- SWAP ---')
-      swap_count = [0, 0, 0, 0, 0]
-      for node in self.nodes:
-        swap_count = [x+y for x, y in zip(swap_count, node.get_swap())]
-        #print(node.get_swap())
-      print("Total swap_count " + str(swap_count))
+    
+    self.queue.append({
+      'key': key,
+      'data': data
+    })
+    #self.schedule(key, data)
+    #self.r.publish(key, 'Processed')
 
   def routine(self, msg):
     if msg.get('type') != 'subscribe':
@@ -102,7 +113,9 @@ class Simulator():
   def subscribe(self):
     try:
       self.p.subscribe(**{config['redis']['channel']:self.routine})
-      t = self.p.run_in_thread(sleep_time = 0.001)
+      t = self.p.run_in_thread(sleep_time = self.thread_sleep_interval)
+      scheduler = Thread(target = self.schedule, daemon=True)
+      scheduler.start()
       while True:
         pass
     except KeyboardInterrupt:
