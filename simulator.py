@@ -25,6 +25,12 @@ class Simulator():
     self.prepare_nodes()
     self.queue = deque([])
     self.thread_sleep_interval = 0.001
+    self.load_data()
+
+  def load_data(self):
+    with open('data.json') as json_file:
+      data = json.load(json_file)
+      self.data = data
 
   def prepare_nodes(self):
     nodes = []
@@ -35,6 +41,29 @@ class Simulator():
 
   def bytes_to_string(self, byte_obj):
     return byte_obj.decode("utf-8")
+
+  def filter_nodes(self, job_id):
+    job_nr = job_id.split(":")[2]
+    available_nodes = []
+    for node in self.nodes:
+      if node.get_avalaible_cpu() > self.data[job_nr]['cpu']:
+        available_nodes.append(node)
+
+    return available_nodes
+
+  def get_best_score_node(self, available_nodes):
+    if not available_nodes:
+      return None
+    
+    best_node = None
+    for node in available_nodes:
+      if not best_node:
+        best_node = node
+      else:
+        if node.get_avalaible_cpu() > best_node.get_avalaible_cpu():
+          best_node = node
+
+    return best_node
 
   def get_most_accurate_node(self):
     best_node = None
@@ -62,10 +91,15 @@ class Simulator():
         job_id = job['key']
         data = job['data']
 
-        node = self.get_most_accurate_node()
-        print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
-        t = Thread(target = self.scheduler_routine, daemon=True, args=(job_id, data, node))
-        t.start()
+        available_nodes = self.filter_nodes(job_id)
+        node = self.get_best_score_node(available_nodes)
+        #node = self.get_most_accurate_node()
+        if node == None:
+          self.queue.appendleft(job)
+        else:
+          print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
+          t = Thread(target = self.scheduler_routine, daemon=True, args=(job_id, data, node))
+          t.start()
       else:
         time.sleep(self.thread_sleep_interval)
 

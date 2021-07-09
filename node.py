@@ -13,7 +13,7 @@ config = yaml.safe_load(open("./config.yml"))
 class Node():
   def __init__(self, id, BeladyFreq):
     self.cache = []
-    self.cpu = 100
+    self.cpu = config['simulator']['vcpu']
     self.id = id
     self.data = None
     self.policies = []

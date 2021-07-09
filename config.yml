@@ -6,3 +6,4 @@ simulator:
   last_id: '619'
   nodes: 3
   cache_size: 100
+  vcpu: 800
