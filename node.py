@@ -38,6 +38,14 @@ class Node():
       RR(cache_size, self.file_size), 
       Belady(cache_size, self.file_size, self.BeladyFreq)]
 
+  def calucate_cache_score(self, files):
+    score = 0
+    for file in files:
+      if file in self.cache:
+        score += 1
+    
+    return score / len(files)
+
   def get_avalaible_cpu(self):
     return self.cpu
 

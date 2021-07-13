@@ -25,6 +25,7 @@ class Simulator():
     self.prepare_nodes()
     self.queue = deque([])
     self.thread_sleep_interval = 0.001
+    self.cache_factor = config['simulator']['cache_factor']
     self.load_data()
 
   def load_data(self):
@@ -51,30 +52,23 @@ class Simulator():
 
     return available_nodes
 
-  def get_best_score_node(self, available_nodes):
+  def get_best_score_node(self, available_nodes, ins):
+    ins_list = []
+    for file in ins:
+      if file == "length":
+        break
+      ins_list.append(file)
+    
     if not available_nodes:
       return None
     
     best_node = None
-    for node in available_nodes:
-      if not best_node:
-        best_node = node
-      else:
-        if node.get_avalaible_cpu() > best_node.get_avalaible_cpu():
-          best_node = node
+    scores = [0] * len(available_nodes)
+    for i in range(len(available_nodes)):
+      scores[i] = (1 - self.cache_factor) * available_nodes[i].get_avalaible_cpu() / config['simulator']['vcpu'] 
+      + self.cache_factor * available_nodes[i].calucate_cache_score(ins_list)
 
-    return best_node
-
-  def get_most_accurate_node(self):
-    best_node = None
-    for node in self.nodes:
-      if not best_node:
-        best_node = node
-      else:
-        if node.get_avalaible_cpu() > best_node.get_avalaible_cpu():
-          best_node = node
-
-    return best_node
+    return available_nodes[scores.index(max(scores))]
 
   def scheduler_routine(self, job_id, data, node):
     node.execute(job_id, data)
@@ -92,7 +86,7 @@ class Simulator():
         data = job['data']
 
         available_nodes = self.filter_nodes(job_id)
-        node = self.get_best_score_node(available_nodes)
+        node = self.get_best_score_node(available_nodes, data.get("ins"))
         #node = self.get_most_accurate_node()
         if node == None:
           self.queue.appendleft(job)

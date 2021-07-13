@@ -7,3 +7,4 @@ simulator:
   nodes: 3
   cache_size: 100
   vcpu: 800
+  cache_factor: 0.5
