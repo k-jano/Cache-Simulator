@@ -6,5 +6,6 @@ simulator:
   last_id: '619'
   nodes: 3
   cache_size: 100
-  vcpu: 800
+  vcpu: 8
   cache_factor: 0.5
+  divisor: 1

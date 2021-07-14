@@ -13,7 +13,7 @@ config = yaml.safe_load(open("./config.yml"))
 class Node():
   def __init__(self, id, BeladyFreq):
     self.cache = []
-    self.cpu = config['simulator']['vcpu']
+    self.cpu = config['simulator']['vcpu'] * 100
     self.id = id
     self.data = None
     self.policies = []
@@ -74,7 +74,7 @@ class Node():
 
   def execute(self, job_id, msg):
     job = job_id.split(":")
-    sleep_time = self.data[str(job[2])]["time"]
+    sleep_time = self.data[str(job[2])]["time"] / config['simulator']['divisor']
     self.cpu -= self.data[str(job[2])]["cpu"]
 
     for file in msg.get("ins"):

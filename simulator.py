@@ -65,7 +65,7 @@ class Simulator():
     best_node = None
     scores = [0] * len(available_nodes)
     for i in range(len(available_nodes)):
-      scores[i] = (1 - self.cache_factor) * available_nodes[i].get_avalaible_cpu() / config['simulator']['vcpu'] 
+      scores[i] = (1 - self.cache_factor) * available_nodes[i].get_avalaible_cpu() / (config['simulator']['vcpu'] * 100) 
       + self.cache_factor * available_nodes[i].calucate_cache_score(ins_list)
 
     return available_nodes[scores.index(max(scores))]
