@@ -77,6 +77,12 @@ class Node():
     for policy in self.policies:
       time_save_count_list.append(policy.get_saved_time())
     return time_save_count_list
+  
+  def get_full_download_time(self):
+    download_time_count_list = []
+    for policy in self.policies:
+      download_time_count_list.append(policy.get_full_download_time())
+    return download_time_count_list
 
   def execute(self, job_id, msg):
     job = job_id.split(":")

@@ -1,26 +1,18 @@
-import yaml
+from algorithms.policy import Policy
 
-config = yaml.safe_load(open("./config.yml"))
-
-class FIFO():
+class FIFO(Policy):
 
   def __init__(self, memory_size, files_size, *args):
+    super().__init__()
     self.name = 'FIFO'
     self.memory_size = memory_size
     self.size = 0
     self.queue = []
-    self.swap_count = 0
     self.files_size = files_size
-    self.hit_count = 0
-    self.miss_count = 0
-    self.bandwith = (config['simulator']['bandwith'] * 1024 * 1024) / 8
-    self.time_saved = 0
-
-  def acc_download_time(self, file_size):
-    self.time_saved += file_size / self.bandwith
 
   def process(self, file):
     file_size = self.files_size[file]
+    self.acc_full_download_time(file_size)
 
     if file in self.queue:
       self.hit_count+=1
@@ -44,19 +36,3 @@ class FIFO():
     self.size += file_size
     self.queue.append(file)
     return self.queue
-
-
-  def get_swap_count(self):
-    return self.swap_count
-
-  def get_hit_count(self):
-    return self.hit_count
-
-  def get_miss_count(self):
-    return self.miss_count
-
-  def get_name(self):
-    return self.name
-
-  def get_saved_time(self):
-    return self.time_saved

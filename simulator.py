@@ -126,6 +126,13 @@ class Simulator():
       #print(node.get_swap())
     print("Total time_saved " + str(time_save_count))
 
+    print('--- FULL DOWNLOAD TIME ---')
+    full_download_time_count = [0, 0, 0, 0, 0]
+    for node in self.nodes:
+      full_download_time_count = [x+y for x, y in zip(full_download_time_count, node.get_full_download_time())]
+      #print(node.get_full_download_time())
+    print("Total full_download_time " + str(full_download_time_count))
+
   def thread_routine(self, msg):
     data = json.loads(self.bytes_to_string(msg.get('data')))
     key = data.get('key')
