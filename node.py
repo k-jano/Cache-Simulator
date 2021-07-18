@@ -72,6 +72,12 @@ class Node():
       miss_count_list.append(policy.get_miss_count())
     return miss_count_list
 
+  def get_time_save(self):
+    time_save_count_list = []
+    for policy in self.policies:
+      time_save_count_list.append(policy.get_saved_time())
+    return time_save_count_list
+
   def execute(self, job_id, msg):
     job = job_id.split(":")
     sleep_time = self.data[str(job[2])]["time"] / config['simulator']['divisor']

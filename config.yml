@@ -9,3 +9,4 @@ simulator:
   vcpu: 8
   cache_factor: 0.5
   divisor: 1
+  bandwith: 10 #Mb/s

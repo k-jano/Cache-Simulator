@@ -1,4 +1,7 @@
 import json
+import yaml
+
+config = yaml.safe_load(open("./config.yml"))
 
 class Belady():
 
@@ -18,11 +21,16 @@ class Belady():
     self.hit_count = 0
     self.miss_count = 0
     self.BeladyFreq = BeladyFreq
+    self.bandwith = (config['simulator']['bandwith'] * 1024 * 1024) / 8
+    self.time_saved = 0
 
   def load_order(self):
     f = open(self.path)
     self.freq = json.load(f)
     f.close()
+
+  def acc_download_time(self, file_size):
+    self.time_saved += file_size / self.bandwith
 
   def process(self, file):
     file_size = self.files_size[file]
@@ -36,6 +44,7 @@ class Belady():
 
     if file in self.cache:
       self.hit_count += 1
+      self.acc_download_time(file_size)
       return
 
     self.miss_count +=1
@@ -92,3 +101,6 @@ class Belady():
 
   def get_name(self):
     return self.name
+
+  def get_saved_time(self):
+    return self.time_saved

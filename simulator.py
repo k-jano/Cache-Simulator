@@ -119,6 +119,13 @@ class Simulator():
       #print(node.get_swap())
     print("Total swap_count " + str(swap_count))
 
+    print('--- TIME SAVE ---')
+    time_save_count = [0, 0, 0, 0, 0]
+    for node in self.nodes:
+      time_save_count = [x+y for x, y in zip(time_save_count, node.get_time_save())]
+      #print(node.get_swap())
+    print("Total time_saved " + str(time_save_count))
+
   def thread_routine(self, msg):
     data = json.loads(self.bytes_to_string(msg.get('data')))
     key = data.get('key')
