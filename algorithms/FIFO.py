@@ -10,13 +10,13 @@ class FIFO(Policy):
     self.queue = []
     self.files_size = files_size
 
-  def process(self, file):
+  def process(self, file, is_in=False):
     file_size = self.files_size[file]
-    self.acc_full_download_time(file_size)
+    self.acc_full_download_time(file_size) if is_in else None
 
     if file in self.queue:
       self.hit_count+=1
-      self.acc_download_time(file_size)
+      self.acc_download_time(file_size) if is_in else None
       return
 
     self.miss_count +=1

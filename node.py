@@ -93,7 +93,7 @@ class Node():
       if file == "length":
         break
       for policy in self.policies:
-        policy.process(msg.get("ins").get(file).get("name"))
+        policy.process(msg.get("ins").get(file).get("name"), True)
 
     time.sleep(sleep_time)
 
