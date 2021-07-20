@@ -4,8 +4,11 @@ from datetime import datetime
 from threading import Thread
 import yaml
 from collections import deque
+import numpy as np
 
 import redis
+import matplotlib.pyplot as plt
+import pandas as pd
 
 from node import Node
 from helpers.belady_freq import BeladyFreq
@@ -98,6 +101,7 @@ class Simulator():
         time.sleep(self.thread_sleep_interval)
 
   def print_output(self):
+    names = ['FIFO', 'LFU', 'LRU', 'RR', 'Belady']
     print('--- HIT ---')
     hit_count = [0, 0, 0, 0, 0]
     for node in self.nodes:
@@ -132,6 +136,31 @@ class Simulator():
       full_download_time_count = [x+y for x, y in zip(full_download_time_count, node.get_full_download_time())]
       #print(node.get_full_download_time())
     print("Total full_download_time " + str(full_download_time_count))
+
+    self.plot_results(names, hit_count, miss_count, swap_count, time_save_count, full_download_time_count)
+
+  def plot_results(self, names, hit_count, miss_count, swap_count, time_save_count, full_download_time_count):
+    _names = np.arange(len(names))
+
+    plot1 = plt.figure(1)
+    ax = plt.subplot(111)
+    hit = ax.bar(_names-0.3, hit_count, width=0.3, color='g', align='center')
+    miss = ax.bar(_names, miss_count, width=0.3, color='r', align='center')
+    swap = ax.bar(_names+0.3, swap_count, width=0.3, color='b', align='center')
+    ax.legend((hit, miss, swap), ('hit', 'miss', 'swap'))
+    plt.xlabel('Policies')
+    plt.ylabel('Files')
+    plt.xticks(_names, names)
+
+    plot2 = plt.figure(2)
+    ax = plt.subplot(111)
+    time_save = ax.bar(_names - 0.3, time_save_count, width=0.3, color='orange', align='center')
+    full_download = ax.bar(_names, full_download_time_count, width=0.3, color='purple', align='center')
+    ax.legend((time_save, full_download), ('time_saved', 'full_download_time'))
+    plt.xticks(_names, names)
+    plt.xlabel('Policies')
+    plt.ylabel('Seconds')
+    plt.show()
 
   def thread_routine(self, msg):
     data = json.loads(self.bytes_to_string(msg.get('data')))
