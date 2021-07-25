@@ -151,6 +151,9 @@ class Simulator():
     plt.xlabel('Policies')
     plt.ylabel('Files')
     plt.xticks(_names, names)
+    plt.suptitle("Cache policies evaluation", fontsize=18)
+    plt.title("%s, nodes %d, cache size: %d, vcpu: %d, cache factor: %d" %
+     (config['simulator']['name'], config['simulator']['nodes'], config['simulator']['cache_size'], config['simulator']['vcpu'], config['simulator']['cache_factor']), fontsize=10)
 
     plot2 = plt.figure(2)
     ax = plt.subplot(111)
@@ -160,6 +163,8 @@ class Simulator():
     plt.xticks(_names, names)
     plt.xlabel('Policies')
     plt.ylabel('Seconds')
+    plt.suptitle("File download", fontsize=18)
+    plt.title("bandwith %d Mb/s, delay %ds" % (config['simulator']['bandwith'], config['simulator']['delay']), fontsize=10)
     plt.show()
 
   def thread_routine(self, msg):
