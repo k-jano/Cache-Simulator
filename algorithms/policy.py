@@ -11,12 +11,13 @@ class Policy(ABC):
     self.miss_count = 0
     self.swap_count = 0
     self.bandwith = (config['simulator']['bandwith'] * 1024 * 1024) / 8
+    self.delay = config['simulator']['delay']
     
   def acc_download_time(self, file_size):
-    self.time_saved += file_size / self.bandwith
+    self.time_saved += file_size / self.bandwith + self.delay
 
   def acc_full_download_time(self, file_size):
-    self.full_download_time += file_size / self.bandwith
+    self.full_download_time += file_size / self.bandwith + self.delay
 
   def get_swap_count(self):
     return self.swap_count

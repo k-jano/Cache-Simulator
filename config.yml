@@ -10,3 +10,4 @@ simulator:
   cache_factor: 0.5
   divisor: 1
   bandwith: 10 #Mb/s
+  delay: 0
