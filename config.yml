@@ -5,9 +5,13 @@ redis:
 simulator:
   name: "Montage2 0.25"
   nodes: 4
-  cache_size: 5000
+  #cache_size: 5000
   vcpu: 48
   cache_factor: 0.5
   divisor: 1
-  bandwith: 10 #Mb/s
+  bandwith: 100 #Mb/s
   delay: 0
+  cache:
+    enabled: true
+    size: 20000
+    policy: 'FIFO'

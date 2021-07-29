@@ -102,42 +102,45 @@ class Simulator():
 
   def print_output(self):
     names = ['FIFO', 'LFU', 'LRU', 'RR', 'Belady']
+    if not config['simulator']['cache']['enabled']:
+      return
+
     print('--- HIT ---')
-    hit_count = [0, 0, 0, 0, 0]
+    hit_count = 0
     for node in self.nodes:
-      hit_count = [x+y for x, y in zip(hit_count, node.get_hit())]
+      hit_count += node.get_hit()
       #print(node.get_hit())
     print("Total hit_count " + str(hit_count))
 
     print('--- MISS ---')
-    miss_count = [0, 0, 0, 0, 0]
+    miss_count = 0
     for node in self.nodes:
-      miss_count = [x+y for x, y in zip(miss_count, node.get_miss())]
+      miss_count += node.get_miss()
       #print(node.get_miss())
     print("Total miss_count " + str(miss_count))
 
     print('--- SWAP ---')
-    swap_count = [0, 0, 0, 0, 0]
+    swap_count = 0
     for node in self.nodes:
-      swap_count = [x+y for x, y in zip(swap_count, node.get_swap())]
+      swap_count += node.get_swap()
       #print(node.get_swap())
     print("Total swap_count " + str(swap_count))
 
     print('--- TIME SAVE ---')
-    time_save_count = [0, 0, 0, 0, 0]
+    time_save_count = 0
     for node in self.nodes:
-      time_save_count = [x+y for x, y in zip(time_save_count, node.get_time_save())]
+      time_save_count += node.get_time_save()
       #print(node.get_swap())
     print("Total time_saved " + str(time_save_count))
 
     print('--- FULL DOWNLOAD TIME ---')
-    full_download_time_count = [0, 0, 0, 0, 0]
+    full_download_time_count = 0
     for node in self.nodes:
-      full_download_time_count = [x+y for x, y in zip(full_download_time_count, node.get_full_download_time())]
+      full_download_time_count += node.get_full_download_time()
       #print(node.get_full_download_time())
     print("Total full_download_time " + str(full_download_time_count))
 
-    self.plot_results(names, hit_count, miss_count, swap_count, time_save_count, full_download_time_count)
+    # self.plot_results(names, hit_count, miss_count, swap_count, time_save_count, full_download_time_count)
 
   def plot_results(self, names, hit_count, miss_count, swap_count, time_save_count, full_download_time_count):
     _names = np.arange(len(names))
@@ -153,7 +156,7 @@ class Simulator():
     plt.xticks(_names, names)
     plt.suptitle("Cache policies evaluation", fontsize=18)
     plt.title("%s, nodes: %d, cache size: %d, vcpu: %d, cache factor: %.2f" %
-     (config['simulator']['name'], config['simulator']['nodes'], config['simulator']['cache_size'], config['simulator']['vcpu'], config['simulator']['cache_factor']), fontsize=10)
+     (config['simulator']['name'], config['simulator']['nodes'], config['simulator']['cache']['size'], config['simulator']['vcpu'], config['simulator']['cache_factor']), fontsize=10)
     plt.savefig("1.png")
 
     plot2 = plt.figure(2)
@@ -200,7 +203,6 @@ class Simulator():
       print('Keyboard Interrupt')
       self.print_output()
       t.stop()
-      os.exit(0)
 
 if __name__ == "__main__":
   simulator = Simulator()

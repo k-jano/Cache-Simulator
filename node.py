@@ -7,6 +7,7 @@ from algorithms.LFU import LFU
 from algorithms.LRU import LRU
 from algorithms.RR import RR
 from algorithms.Belady import Belady
+from helpers.mock_download import mock_download
 
 config = yaml.safe_load(open("./config.yml"))
 
@@ -31,12 +32,21 @@ class Node():
       file_size = json.load(json_file)
       self.file_size = file_size
 
-    cache_size = config['simulator']['cache_size'] * 1024 * 1024
-    self.policies = [FIFO(cache_size, self.file_size),
-      LFU(cache_size, self.file_size),
-      LRU(cache_size, self.file_size),
-      RR(cache_size, self.file_size), 
-      Belady(cache_size, self.file_size, self.BeladyFreq)]
+    cache_size = config['simulator']['cache']['size'] * 1024 * 1024
+    policy = config['simulator']['cache']['policy']
+    if policy == 'FIFO':
+      self.policy =FIFO(cache_size, self.file_size)
+    elif policy == 'LFU':
+      self.policy = LFU(cache_size, self.file_size)
+    elif policy == 'LRU':
+      self.policy = LRU(cache_size, self.file_size)
+    elif policy == 'RR':
+      self.policy = RR(cache_size, self.file_size)
+    elif policy == 'Belady':
+      self.policy = Belady(cache_size, self.file_size, self.BeladyFreq)
+    else:
+      print('Wrong policy')
+      os.exit(1)
 
   def calucate_cache_score(self, files):
     score = 0
@@ -55,34 +65,39 @@ class Node():
     print('End mocking exectuion %d' % self.env.now)
 
   def get_swap(self):
-    swap_count_list = []
-    for policy in self.policies:
-      swap_count_list.append(policy.get_swap_count())
-    return swap_count_list
+    return self.policy.get_swap_count()
+    # swap_count_list = []
+    # for policy in self.policies:
+    #   swap_count_list.append(policy.get_swap_count())
+    # return swap_count_list
 
   def get_hit(self):
-    hit_count_list = []
-    for policy in self.policies:
-      hit_count_list.append(policy.get_hit_count())
-    return hit_count_list
+    return self.policy.get_hit_count()
+    # hit_count_list = []
+    # for policy in self.policies:
+    #   hit_count_list.append(policy.get_hit_count())
+    # return hit_count_list
 
   def get_miss(self):
-    miss_count_list = []
-    for policy in self.policies:
-      miss_count_list.append(policy.get_miss_count())
-    return miss_count_list
+    return self.policy.get_miss_count()
+    # miss_count_list = []
+    # for policy in self.policies:
+    #   miss_count_list.append(policy.get_miss_count())
+    # return miss_count_list
 
   def get_time_save(self):
-    time_save_count_list = []
-    for policy in self.policies:
-      time_save_count_list.append(policy.get_saved_time())
-    return time_save_count_list
+    return self.policy.get_saved_time()
+    # time_save_count_list = []
+    # for policy in self.policies:
+    #   time_save_count_list.append(policy.get_saved_time())
+    # return time_save_count_list
   
   def get_full_download_time(self):
-    download_time_count_list = []
-    for policy in self.policies:
-      download_time_count_list.append(policy.get_full_download_time())
-    return download_time_count_list
+    return self.policy.get_full_download_time()
+    # download_time_count_list = []
+    # for policy in self.policies:
+    #   download_time_count_list.append(policy.get_full_download_time())
+    # return download_time_count_list
 
   def execute(self, job_id, msg):
     job = job_id.split(":")
@@ -92,16 +107,21 @@ class Node():
     for file in msg.get("ins"):
       if file == "length":
         break
-      for policy in self.policies:
-        policy.process(msg.get("ins").get(file).get("name"), True)
+      # for policy in self.policies:
+      #   policy.process(msg.get("ins").get(file).get("name"), True)
+      name = msg.get("ins").get(file).get("name")
+      if config['simulator']['cache']['enabled']:
+        self.policy.process(name, True)
+      else:
+        mock_download(self.file_size[name])
 
     time.sleep(sleep_time)
 
     for file in msg.get("outs"):
       if file == "length":
         break
-      for policy in self.policies:
-        policy.process(msg.get("outs").get(file).get("name"))
+      if config['simulator']['cache']['enabled']:
+        self.policy.process(msg.get("outs").get(file).get("name"))
 
     self.cpu += self.data[str(job[2])]["cpu"]
       #self.memory += self.data[str(job[2])]["cpu"]

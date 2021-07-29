@@ -1,3 +1,4 @@
+# import time
 from abc import ABC
 import yaml
 
@@ -18,6 +19,9 @@ class Policy(ABC):
 
   def acc_full_download_time(self, file_size):
     self.full_download_time += file_size / self.bandwith + self.delay
+
+  # def mock_download(self, file_size):
+  #   time.sleep(file_size / self.bandwith + self.delay)
 
   def get_swap_count(self):
     return self.swap_count

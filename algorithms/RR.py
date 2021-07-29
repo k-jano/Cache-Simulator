@@ -1,6 +1,7 @@
 import random
 
 from algorithms.policy import Policy
+from helpers.mock_download import mock_download
 
 class RR(Policy):
 
@@ -27,6 +28,8 @@ class RR(Policy):
       self.cache.append(file)
     else:
       self.swap(file, file_size)
+    
+    mock_download(file_size) if is_in else None
 
   def swap(self, file, file_size):
     while self.size + file_size > self.memory_size:
