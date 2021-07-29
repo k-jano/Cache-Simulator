@@ -1,10 +1,12 @@
 import json
 import pprint
 
-path = "./workflow.json"
+path = "./1000genome_wf.json"
 
-f = open(path)
-data = json.load(f)
+#f = open(path)
+with open(path) as f:
+    data = json.load(f)
+
 pp = pprint.PrettyPrinter(indent=4)
 
 frequency_dict = {}

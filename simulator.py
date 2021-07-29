@@ -78,8 +78,8 @@ class Simulator():
 
     self.r.publish(job_id, 'Processed')
 
-    if job_id.split(":")[2] == config['simulator']['last_id']:
-      self.print_output()
+    # if job_id.split(":")[2] == config['simulator']['last_id']:
+    #   self.print_output()
 
   def schedule(self):
     while True:
@@ -152,8 +152,9 @@ class Simulator():
     plt.ylabel('Files')
     plt.xticks(_names, names)
     plt.suptitle("Cache policies evaluation", fontsize=18)
-    plt.title("%s, nodes %d, cache size: %d, vcpu: %d, cache factor: %d" %
+    plt.title("%s, nodes: %d, cache size: %d, vcpu: %d, cache factor: %.2f" %
      (config['simulator']['name'], config['simulator']['nodes'], config['simulator']['cache_size'], config['simulator']['vcpu'], config['simulator']['cache_factor']), fontsize=10)
+    plt.savefig("1.png")
 
     plot2 = plt.figure(2)
     ax = plt.subplot(111)
@@ -164,7 +165,8 @@ class Simulator():
     plt.xlabel('Policies')
     plt.ylabel('Seconds')
     plt.suptitle("File download", fontsize=18)
-    plt.title("bandwith %d Mb/s, delay %ds" % (config['simulator']['bandwith'], config['simulator']['delay']), fontsize=10)
+    plt.title("bandwith: %d Mb/s, delay: %ds" % (config['simulator']['bandwith'], config['simulator']['delay']), fontsize=10)
+    plt.savefig("2.png")
     plt.show()
 
   def thread_routine(self, msg):
@@ -196,7 +198,9 @@ class Simulator():
         pass
     except KeyboardInterrupt:
       print('Keyboard Interrupt')
+      self.print_output()
       t.stop()
+      os.exit(0)
 
 if __name__ == "__main__":
   simulator = Simulator()
