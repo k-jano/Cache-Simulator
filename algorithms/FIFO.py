@@ -17,11 +17,11 @@ class FIFO(Policy):
     self.acc_full_download_time(file_size) if is_in else None
 
     if file in self.queue:
-      self.hit_count+=1
+      self.hit_count+=1 if is_in else 0
       self.acc_download_time(file_size) if is_in else None
       return
 
-    self.miss_count +=1
+    self.miss_count +=1 if is_in else 0
 
     if self.size + file_size <= self.memory_size:
       self.size += file_size
