@@ -25,6 +25,11 @@ class Downloader():
       return True
     return False
 
+  def get_left_size(self, id):
+    if id in self.old_jobs:
+      return 0
+    return self.jobs[id]['left']
+
   def routine(self):
     while True:
       time.sleep(1)
@@ -35,6 +40,8 @@ class Downloader():
       for key in self.jobs.keys():
         job = self.jobs[key]
         job['left'] -= single_bandwith
+        if job['left'] < 0:
+          job['left'] = 0
         job['time'] += 1
         self.jobs[key] = job
 

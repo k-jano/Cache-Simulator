@@ -128,19 +128,19 @@ class Simulator():
       #print(node.get_swap())
     print("Total swap_count " + str(swap_count))
 
-    print('--- TIME SAVE ---')
-    time_save_count = 0
+    print('--- DOWNLOAD SIZE ---')
+    download_size_count = 0
     for node in self.nodes:
-      time_save_count += node.get_time_save()
+      download_size_count += node.get_download_size()
       #print(node.get_swap())
-    print("Total time_saved " + str(time_save_count))
+    print("Total download_size " + str(download_size_count))
 
-    print('--- FULL DOWNLOAD TIME ---')
-    full_download_time_count = 0
+    print('--- FULL DOWNLOAD SIZE ---')
+    full_download_size_count = 0
     for node in self.nodes:
-      full_download_time_count += node.get_full_download_time()
+      full_download_size_count += node.get_full_download_size()
       #print(node.get_full_download_time())
-    print("Total full_download_time " + str(full_download_time_count))
+    print("Total full_download_time " + str(full_download_size_count))
 
     # self.plot_results(names, hit_count, miss_count, swap_count, time_save_count, full_download_time_count)
 

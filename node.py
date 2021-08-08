@@ -86,15 +86,15 @@ class Node():
     #   miss_count_list.append(policy.get_miss_count())
     # return miss_count_list
 
-  def get_time_save(self):
-    return self.policy.get_saved_time()
+  def get_download_size(self):
+    return self.policy.get_download_size()
     # time_save_count_list = []
     # for policy in self.policies:
     #   time_save_count_list.append(policy.get_saved_time())
     # return time_save_count_list
   
-  def get_full_download_time(self):
-    return self.policy.get_full_download_time()
+  def get_full_download_size(self):
+    return self.policy.get_full_download_size()
     # download_time_count_list = []
     # for policy in self.policies:
     #   download_time_count_list.append(policy.get_full_download_time())

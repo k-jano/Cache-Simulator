@@ -9,9 +9,9 @@ simulator:
   vcpu: 48
   cache_factor: 0.5
   divisor: 1
-  bandwith: 1.5 #Gb/s
+  bandwith: 15 #Gb/s
   delay: 0
   cache:
-    enabled: false
+    enabled: true
     size: 5000
     policy: 'FIFO'
