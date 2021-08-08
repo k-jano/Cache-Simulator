@@ -1,9 +1,10 @@
 from algorithms.policy import Policy
 from helpers.mock_download import mock_download
+import time
 
 class LFU(Policy):
 
-  def __init__(self, memory_size, files_size, *args):
+  def __init__(self, memory_size, files_size, downloader, *args):
     super().__init__()
     self.name = 'LFU'
     self.MAX = 1000000
@@ -12,28 +13,37 @@ class LFU(Policy):
     self.cache = []
     self.files_size = files_size
     self.LFU_dict = {}
+    self.downloader = downloader
     for i in files_size:
       self.LFU_dict[i] = 0
 
   def process(self, file, is_in=False):
     file_size = self.files_size[file]
-    self.acc_full_download_time(file_size) if is_in else None
+    self.acc_full_download_size(file_size) if is_in else None
     self.LFU_dict[file] = self.LFU_dict[file] + 1
 
     if file in self.cache:
       self.hit_count += 1 if is_in else 0
-      self.acc_download_time(file_size) if is_in else None
+      job_id = self.downloads[file]
+      self.acc_download_size(self.downloader.get_left_size(job_id))
+      while not self.downloader.is_job_done(job_id):
+        time.sleep(1)
       return
 
     self.miss_count += 1 if is_in else 0
 
     if self.size + file_size <= self.memory_size:
       self.size += file_size
-      self.cache.append(file)
+      #self.cache.append(file)
     else:
       self.swap(file, file_size)
 
-    mock_download(file_size) if is_in else None
+    if is_in:
+      job_id = self.downloader.create_job(file_size)
+      self.downloads[file] = job_id
+      self.cache.append(file)
+      while not self.downloader.is_job_done(job_id):
+        time.sleep(1)
 
   def swap(self, file, file_size):
     while self.size + file_size > self.memory_size:
@@ -43,7 +53,7 @@ class LFU(Policy):
       self.swap_count += 1
 
     self.size += file_size
-    self.cache.append(file)
+    #self.cache.append(file)
 
   def get_LFU(self):
     LFU_elem = -1

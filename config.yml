@@ -14,4 +14,4 @@ simulator:
   cache:
     enabled: true
     size: 5000
-    policy: 'FIFO'
+    policy: 'Belady'
