@@ -12,6 +12,7 @@ import pandas as pd
 
 from node import Node
 from helpers.belady_freq import BeladyFreq
+from downloader import Downloader
 
 config = yaml.safe_load(open("./config.yml"))
 
@@ -25,6 +26,7 @@ class Simulator():
     #self.nodes = [Node(0, self.BeladyFreq), Node(1, self.BeladyFreq), Node(2, self.BeladyFreq)]
     self.p = self.r.pubsub()
     self.flag = True
+    self.downloader = Downloader()
     self.prepare_nodes()
     self.queue = deque([])
     self.thread_sleep_interval = 0.001
@@ -39,7 +41,7 @@ class Simulator():
   def prepare_nodes(self):
     nodes = []
     for i in range(config['simulator']['nodes']):
-      nodes.append(Node(i, self.BeladyFreq))
+      nodes.append(Node(i, self.BeladyFreq, self.downloader))
 
     self.nodes = nodes
 
@@ -197,6 +199,8 @@ class Simulator():
       t = self.p.run_in_thread(sleep_time = self.thread_sleep_interval)
       scheduler = Thread(target = self.schedule, daemon=True)
       scheduler.start()
+      downloader_t = Thread(target = self.downloader.routine, daemon=True)
+      downloader_t.start()
       while True:
         pass
     except KeyboardInterrupt:

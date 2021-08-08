@@ -12,7 +12,7 @@ from helpers.mock_download import mock_download
 config = yaml.safe_load(open("./config.yml"))
 
 class Node():
-  def __init__(self, id, BeladyFreq):
+  def __init__(self, id, BeladyFreq, downloader):
     self.cache = []
     self.cpu = config['simulator']['vcpu'] * 100
     self.id = id
@@ -20,6 +20,7 @@ class Node():
     self.policies = []
     self.file_size = None
     self.BeladyFreq = BeladyFreq
+    self.downloader = downloader
 
     self.load_data()
 
@@ -35,15 +36,15 @@ class Node():
     cache_size = config['simulator']['cache']['size'] * 1024 * 1024
     policy = config['simulator']['cache']['policy']
     if policy == 'FIFO':
-      self.policy =FIFO(cache_size, self.file_size)
+      self.policy =FIFO(cache_size, self.file_size, self.downloader)
     elif policy == 'LFU':
-      self.policy = LFU(cache_size, self.file_size)
+      self.policy = LFU(cache_size, self.file_size, self.downloader)
     elif policy == 'LRU':
-      self.policy = LRU(cache_size, self.file_size)
+      self.policy = LRU(cache_size, self.file_size, self.downloader)
     elif policy == 'RR':
-      self.policy = RR(cache_size, self.file_size)
+      self.policy = RR(cache_size, self.file_size, self.downloader)
     elif policy == 'Belady':
-      self.policy = Belady(cache_size, self.file_size, self.BeladyFreq)
+      self.policy = Belady(cache_size, self.file_size, self.downloader, self.BeladyFreq)
     else:
       print('Wrong policy')
       os.exit(1)
@@ -113,7 +114,7 @@ class Node():
       if config['simulator']['cache']['enabled']:
         self.policy.process(name, True)
       else:
-        mock_download(self.file_size[name])
+        mock_download(self.file_size[name], self.downloader)
 
     time.sleep(sleep_time)
 
