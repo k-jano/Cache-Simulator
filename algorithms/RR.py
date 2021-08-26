@@ -3,6 +3,7 @@ import random
 from algorithms.policy import Policy
 from helpers.mock_download import mock_download
 import time
+import threading
 
 class RR(Policy):
 
@@ -14,6 +15,7 @@ class RR(Policy):
     self.cache = []
     self.files_size = files_size
     self.downloader = downloader
+    self.lock = threading.Lock()
 
   def process(self, file, is_in=False):
     file_size = self.files_size[file]
@@ -23,8 +25,10 @@ class RR(Policy):
       self.hit_count += 1 if is_in else 0
       job_id = self.downloads[file]
       self.acc_download_size(self.downloader.get_left_size(job_id))
+      downlaoded = self.downloader.is_job_done(job_id)
       while not self.downloader.is_job_done(job_id):
         time.sleep(1)
+      time.sleep(self.delay) if not downlaoded else None
       return
 
     self.miss_count += 1 if is_in else 0
@@ -40,13 +44,16 @@ class RR(Policy):
       self.cache.append(file)
       while not self.downloader.is_job_done(job_id):
         time.sleep(1)
+      time.sleep(self.delay)
 
   def swap(self, file, file_size):
     while self.size + file_size > self.memory_size:
+      self.lock.acquire()
       RR_elem = self.get_RR()
       self.size -= self.files_size[RR_elem]
       self.cache.remove(RR_elem)
       self.swap_count += 1
+      self.lock.release()
 
     self.size += file_size
     #self.cache.append(file)

@@ -22,8 +22,10 @@ class FIFO(Policy):
       self.hit_count+=1 if is_in else 0
       job_id = self.downloads[file]
       self.acc_download_size(self.downloader.get_left_size(job_id))
+      downlaoded = self.downloader.is_job_done(job_id)
       while not self.downloader.is_job_done(job_id):
         time.sleep(1)
+      time.sleep(self.delay) if not downlaoded else None
       return
 
     self.miss_count +=1 if is_in else 0
@@ -40,6 +42,7 @@ class FIFO(Policy):
       self.queue.append(file)
       while not self.downloader.is_job_done(job_id):
         time.sleep(1)
+      time.sleep(self.delay)
 
   def swap(self, file, file_size):
     while self.size + file_size > self.memory_size:

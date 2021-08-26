@@ -35,6 +35,7 @@ class Downloader():
       time.sleep(1)
 
       #routine
+      #print(len(self.jobs.keys()))
       single_bandwith = self.bandwith / len(self.jobs.keys()) if len(self.jobs.keys()) > 0 else None
 
       for key in self.jobs.keys():

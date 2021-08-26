@@ -21,6 +21,7 @@ class Node():
     self.file_size = None
     self.BeladyFreq = BeladyFreq
     self.downloader = downloader
+    self.delay = config['simulator']['delay']
 
     self.load_data()
 
@@ -115,6 +116,7 @@ class Node():
         self.policy.process(name, True)
       else:
         mock_download(self.file_size[name], self.downloader)
+        time.sleep(self.delay)
 
     time.sleep(sleep_time)
 

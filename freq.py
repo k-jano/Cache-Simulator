@@ -1,7 +1,7 @@
 import json
 import pprint
 
-path = "./1000genome_wf.json"
+path = "./Montagewf.json"
 
 #f = open(path)
 with open(path) as f:

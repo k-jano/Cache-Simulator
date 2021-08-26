@@ -1,6 +1,7 @@
 from algorithms.policy import Policy
 from helpers.mock_download import mock_download
 import time
+import threading
 
 class LFU(Policy):
 
@@ -14,6 +15,7 @@ class LFU(Policy):
     self.files_size = files_size
     self.LFU_dict = {}
     self.downloader = downloader
+    self.lock = threading.Lock()
     for i in files_size:
       self.LFU_dict[i] = 0
 
@@ -26,8 +28,10 @@ class LFU(Policy):
       self.hit_count += 1 if is_in else 0
       job_id = self.downloads[file]
       self.acc_download_size(self.downloader.get_left_size(job_id))
+      downlaoded = self.downloader.is_job_done(job_id)
       while not self.downloader.is_job_done(job_id):
         time.sleep(1)
+      time.sleep(self.delay) if not downlaoded else None
       return
 
     self.miss_count += 1 if is_in else 0
@@ -44,13 +48,16 @@ class LFU(Policy):
       self.cache.append(file)
       while not self.downloader.is_job_done(job_id):
         time.sleep(1)
+      time.sleep(self.delay)
 
   def swap(self, file, file_size):
     while self.size + file_size > self.memory_size:
+      self.lock.acquire()
       LFU_elem = self.get_LFU()
       self.size -= self.files_size[LFU_elem]
       self.cache.remove(LFU_elem)
       self.swap_count += 1
+      self.lock.release()
 
     self.size += file_size
     #self.cache.append(file)
