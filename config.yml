@@ -3,11 +3,14 @@ redis:
   port: 6379
   channel: SIMULATOR
 simulator:
-  name: "Montage2 0.25"
-  nodes: 4
-  cache_size: 5000
+  name: "Montage-2mass-10d"
+  nodes: 5
   vcpu: 48
   cache_factor: 0.5
   divisor: 1
-  bandwith: 10 #Mb/s
-  delay: 0
+  bandwith: 0.2 #Gb/s
+  delay: 0.4
+  cache:
+    enabled: true
+    size: 5000
+    policy: 'Belady'
