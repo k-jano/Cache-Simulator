@@ -30,7 +30,7 @@ class Downloader():
       return 0
     return self.jobs[id]['left']
 
-  def routine(self):
+  def download_files(self):
     while True:
       time.sleep(1)
 

@@ -75,7 +75,7 @@ class Simulator():
 
     return available_nodes[scores.index(max(scores))]
 
-  def scheduler_routine(self, job_id, data, node):
+  def execute_job(self, job_id, data, node):
     node.execute(job_id, data)
 
     self.r.publish(job_id, 'Processed')
@@ -97,7 +97,7 @@ class Simulator():
           self.queue.appendleft(job)
         else:
           print('[%s] Job %s scheduled on node %s' % (datetime.now().strftime("%d/%m/%Y %H:%M:%S"), job_id, node.id))
-          t = Thread(target = self.scheduler_routine, daemon=True, args=(job_id, data, node))
+          t = Thread(target = self.execute_job, daemon=True, args=(job_id, data, node))
           t.start()
       else:
         time.sleep(self.thread_sleep_interval)
@@ -199,7 +199,7 @@ class Simulator():
       t = self.p.run_in_thread(sleep_time = self.thread_sleep_interval)
       scheduler = Thread(target = self.schedule, daemon=True)
       scheduler.start()
-      downloader_t = Thread(target = self.downloader.routine, daemon=True)
+      downloader_t = Thread(target = self.downloader.download_files, daemon=True)
       downloader_t.start()
       while True:
         pass
