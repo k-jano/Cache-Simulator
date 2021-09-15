@@ -24,7 +24,7 @@ for key in data:
     file_size.append(data[key])
 
 num_bins = 50
-ax.hist(file_size, num_bins)
+ax.hist(file_size, num_bins, log=True)
 
 plt.xlabel('File Size [B]')
 plt.ylabel('Number of files')
@@ -33,9 +33,6 @@ plt.title('File size distribution in %s workflow' % config['simulator']['name'])
 plt.savefig('sizes.png')
 
 #2
-
-# plot2 = plt.figure(2)
-# ax = plt.subplot(111)
 
 with open(path_freq) as f:
     data = json.load(f)
@@ -46,16 +43,8 @@ for key in data:
         file_freq[data[key]] = 1
     else:
         file_freq[data[key]] += 1
-    # file_freq.append(data[key])
 
 
 pp.pprint(file_freq)
-# num_bins = max(file_freq)
-# ax.hist(file_freq, num_bins)
-
-# plt.xlabel('Occurrence as input')
-# plt.ylabel('Number of files')
-
-# plt.title('File occurrence distribution in %s workflow' % config['simulator']['name'])
 
 plt.show()
