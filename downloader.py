@@ -9,6 +9,7 @@ class Downloader():
     self.jobs = {}
     self.old_jobs = {}
     self.bandwith = (config['simulator']['bandwith'] * 1024 * 1024 * 1024) / 8
+    self.divisor = config['simulator']['divisor']
 
   def create_job(self, file_size):
     job = {
@@ -36,7 +37,8 @@ class Downloader():
 
       #routine
       #print(len(self.jobs.keys()))
-      single_bandwith = self.bandwith / len(self.jobs.keys()) if len(self.jobs.keys()) > 0 else None
+      # single_bandwith = self.bandwith / len(self.jobs.keys()) if len(self.jobs.keys()) > 0 else None
+      single_bandwith = (self.bandwith / len(self.jobs.keys()) ) * self.divisor if len(self.jobs.keys()) > 0 else None
 
       for key in self.jobs.keys():
         job = self.jobs[key]
